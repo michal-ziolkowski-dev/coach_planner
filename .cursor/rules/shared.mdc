@@ -1,0 +1,38 @@
+---
+alwaysApply: true
+---
+# AI Rules for {{project-name}}
+
+{{project-description}}
+
+## Tech Stack
+
+- Flutter 4.x (mobile & web)
+
+## Project Structure
+
+- `./` - project root
+- `./src/lib` - Flutter source code
+- `./src/lib/layouts` - shared Flutter layouts
+- `./src/lib/pages` - Flutter pages (screens)
+- `./src/lib/components` - reusable Flutter widgets
+- `./src/lib/services/api` - API client & integration layer
+- `./src/assets` - static assets used by the app (images, fonts, etc.)
+- `./public` - public assets
+
+When modifying the directory structure, always update this section.
+
+When modifying the directory structure, always update this section.
+
+## Coding practices
+
+### Guidelines for clean code
+
+- Prioritize error handling and edge cases
+- Handle errors and edge cases at the beginning of functions.
+- Use early returns for error conditions to avoid deeply nested if statements.
+- Place the happy path last in the function for improved readability.
+- Avoid unnecessary else statements; use if-return pattern instead.
+- Use guard clauses to handle preconditions and invalid states early.
+- Implement proper error logging and user-friendly error messages.
+- Consider using custom error types or error factories for consistent error handling.

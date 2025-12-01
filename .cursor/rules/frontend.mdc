@@ -1,0 +1,144 @@
+---
+globs: "**/*.{dart,yaml,arb,json}"
+alwaysApply: false
+---
+
+# Frontend (Flutter) – Wytyczne
+
+## Ogólne
+- Flutter 3.x, Dart 3; targety: Web .
+- Struktura `lib/`:
+  - `app/` – bootstrap (router, DI, theme)
+  - `features/<feature_name>/` – `data/`, `domain/`, `presentation/`
+  - `shared/` – design system (theme, widgets), utils, services
+- Stan: **Riverpod** (preferowane) lub **Bloc**. Trzymaj logikę poza widgetami.
+- Nawigacja: **go_router** (deep linki, guards, sub-routes).
+
+## Styl i Design System
+- Używaj **ThemeData** / **ColorScheme** (Material 3). Traktuj kolory/typografię jako *tokens*.
+- Twórz reużywalne komponenty (np. `AppButton`, `AppCard`) zamiast dublować dekoracje.
+- Responsywność: `LayoutBuilder`, `MediaQuery`, własne *breakpoints* (np. 600 / 840 / 1200).
+- Unikaj *magic numbers*: trzymaj spacing, promienie, font sizes w jednym miejscu (np. `AppSpacing`, `AppRadius`).
+
+### Przykład (skrót) ThemeData / ColorScheme
+- seedColor (np. `0xFF0066FF`), `useMaterial3: true`.
+- Wspólna rodzina fontów (np. „Inter”) ustawiona w `textTheme.apply(...)`.
+
+## Dostępność (A11y)
+- **Semantics** dla elementów interaktywnych (label, roles).
+- Fokus/klawiatura (web/desktop): `Focus`, `FocusTraversalGroup`, `Shortcuts/Actions`.
+- Widoczny focus (np. `InkWell` + `focusColor`); nie usuwaj outline bez zamiennika.
+- Kontrast min. WCAG AA; respektuj `MediaQuery.of(context).disableAnimations`.
+- Testuj VoiceOver (iOS) i TalkBack (Android).
+
+## Wydajność
+- Oznaczaj **`const`** gdzie się da.
+- Dziel widgety, precyzyjnie nasłuchuj zmian (Riverpod `select`).
+- Listy: `ListView.builder`, `AutomaticKeepAliveClientMixin` tam, gdzie warto.
+- Obrazy: `cached_network_image`, właściwe rozmiary; ciężkie sekcje opakuj w `RepaintBoundary`.
+- Rozważ lazy importy / *deferred components* dla dużych feature’ów.
+
+## Formularze i walidacja
+- `Form` + `TextFormField` + walidatory; komunikaty trzymaj w i18n.
+- Dla złożonych form: `reactive_forms` lub kontrolery + Riverpod.
+
+## i18n / l10n
+- `flutter_localizations` + pliki **ARB** (`lib/l10n/`), formatowanie przez `intl`.
+- Klucze stabilne, bez interpolacji w kluczach; pluralizacja przez ICU.
+
+## Testy i jakość
+- Unit: logika domeny i providery.
+- Widget: kluczowe UI (stany, interakcje, semantyka).
+- Golden: krytyczne ekrany / komponenty design systemu.
+- Integracyjne/e2e: najważniejsze ścieżki (np. logowanie, checkout).
+- Narzędzia: **flutter_lints**, **very_good_analysis** (opcjonalnie), **pre-commit** (format, analyze, tests).
+
+## Analiza statyczna / format
+- `dart format --fix` (wymagany w CI).
+- `dart analyze` bez błędów; ostrzeżenia rozwiązujemy, nie ignorujemy globalnie.
+
+## Logging / telemetry
+- Jednolite API logowania (np. `AppLogger`), bez `print` w produkcji.
+- Analityka przez abstrakcję (np. `AnalyticsService`), bez twardych wywołań w widgetach.
+
+## Web / Desktop – specyfika
+- Skróty klawiszowe: `Shortcuts/Actions` (Enter/Escape/Strzałki).
+- Kursory: `MouseRegion` dla hover; focus ring dla klawiatury.
+- Media: `kIsWeb` tylko w wyjątkach (abstrahuj różnice).
+
+## Pakiety (rekomendowane)
+- Stan: `flutter_riverpod`, `hooks_riverpod` (opcjonalnie).
+- Nawigacja: `go_router`.
+- HTTP: `dio` (+ interceptory, retry).
+- JSON: `json_serializable` (+ `build_runner`).
+- i18n: `intl`.
+- Obrazy: `cached_network_image`.
+- Storage: `shared_preferences` lub `hive` (offline).
+- Testy: `flutter_test`, `mocktail`, `golden_toolkit`.
+
+## CI (prosty zestaw)
+- `flutter pub get`
+- `dart format --output=none --set-exit-if-changed .`
+- `dart analyze`
+- `flutter test --coverage`
+- (opcjonalnie) golden tests na dedykowanym jobie
+
+---
+
+## Szybkie wycinki (ready-to-paste)
+
+### Riverpod – prosty provider stanu
+```dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class Counter extends StateNotifier<int> {
+  Counter(): super(0);
+  void inc() => state++;
+  void dec() => state--;
+}
+
+final counterProvider = StateNotifierProvider<Counter, int>((ref) => Counter());
+
+go_router – podstawowa konfiguracja
+import 'package:go_router/go_router.dart';
+import 'package:flutter/widgets.dart';
+
+final router = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(path: '/', builder: (_, __) => const HomeScreen()),
+    GoRoute(path: '/details/:id', builder: (ctx, st) => DetailsScreen(id: st.pathParameters['id']!)),
+  ],
+  errorBuilder: (_, __) => const NotFoundScreen(),
+);
+
+ThemeData – Material 3 + ColorScheme
+import 'package:flutter/material.dart';
+
+ThemeData buildTheme() {
+  final scheme = ColorScheme.fromSeed(seedColor: const Color(0xFF0066FF));
+  return ThemeData(
+    useMaterial3: true,
+    colorScheme: scheme,
+    textTheme: const TextTheme().apply(fontFamily: 'Inter'),
+    inputDecorationTheme: const InputDecorationTheme(border: OutlineInputBorder()),
+  );
+}
+
+Semantics – przykład dla przycisku
+Semantics(
+  label: 'Dodaj do koszyka',
+  button: true,
+  child: IconButton(
+    icon: const Icon(Icons.add_shopping_cart),
+    onPressed: onAdd,
+  ),
+);
+
+Responsywność – proste breakpoints
+Widget responsive(BuildContext context) {
+  final w = MediaQuery.of(context).size.width;
+  if (w >= 1200) return const DesktopLayout();
+  if (w >= 840) return const TabletLayout();
+  return const PhoneLayout();
+}

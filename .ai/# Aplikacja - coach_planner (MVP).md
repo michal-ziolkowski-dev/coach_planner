@@ -1,4 +1,4 @@
- # Aplikacja - coach planner (MVP)
+# Aplikacja - coach planner (MVP)
 
 ## Główny problem((
 Rejestrowanie się osób uprawiajacych(użytkoiwnikóa) sport do trenerów tego sportu

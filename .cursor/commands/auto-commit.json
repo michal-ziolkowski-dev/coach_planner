@@ -1,0 +1,7 @@
+{
+    "title": "Auto Conventional Commit",
+    "description": "Generate Conventional Commit message and commit all changes automatically.",
+    "type": "shell",
+    "prompt": "Analyze the full git diff (staged and unstaged). Create a Conventional Commit message using feat/fix/docs/refactor/chore/test/perf/ci. Output ONLY the commit message, nothing else.",
+    "command": "git add -A :/ && git commit -m \"$input\""
+  }
