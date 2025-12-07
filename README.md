@@ -65,6 +65,26 @@ The MVP focuses on a responsive web app that supports self-registration for both
 
 > Run the commands above from the `src` directory.
 
+## Supabase Type Generation
+
+We scaffold typed Supabase models with [Supadart](https://github.com/mmvergara/supadart?tab=readme-ov-file). Workflow:
+
+1. Install the CLI once:
+   ```bash
+   dart pub global activate supadart
+   ```
+2. Initialize a config (creates `supadart.yaml` if missing):
+   ```bash
+   supadart --init
+   ```
+3. Fill in `SUPABASE_URL`, `SUPABASE_API_KEY`, enums, and custom types inside `supadart.yaml`.
+4. Generate/update models (run from `src/` so the output lands in `lib/models`):
+   ```bash
+   supadart --config supadart.yaml
+   ```
+
+Regenerate classes whenever the database schema changes and commit the updated `lib/models/generated_classes.dart`.
+
 ## Project Scope
 
 - Role-based authentication with self-service registration, login, logout, password changes, and account deletion.

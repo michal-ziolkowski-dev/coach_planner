@@ -18,6 +18,7 @@ alwaysApply: true
 - `./src/lib/components` - reusable Flutter widgets
 - `./src/lib/services/api` - API client & integration layer
 - `./src/assets` - static assets used by the app (images, fonts, etc.)
+- `./src/types` - shared types for backend and frontend (Entities, DTOs)
 - `./public` - public assets
 
 When modifying the directory structure, always update this section.
